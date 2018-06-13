@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PostVC: UIViewController, UITextViewDelegate {
+class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     // UI objects
     @IBOutlet var textTxt: UITextView!
