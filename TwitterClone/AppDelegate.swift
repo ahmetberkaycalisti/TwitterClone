@@ -8,17 +8,196 @@
 
 import UIKit
 
+// global variable refered to appdelegate to be able to call it from any class / file.swift
+let appDelegate : AppDelegate = UIApplication.shared.delegate as! AppDelegate
+
+let colorSmoothRed = UIColor(red: 255/255, green: 50/255, blue: 75/255, alpha: 1)
+let colorLightGreen = UIColor(red: 30/255, green: 244/255, blue: 125/255, alpha: 1)
+let colorSmoothGray = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1)
+let colorBrandBlue = UIColor(red: 45/255, green: 213/255, blue: 255/255, alpha: 1)
+
+let fontSize12 = UIScreen.main.bounds.width / 31
+
+var user: NSDictionary?
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    
+    
+    
+    
+    // image to be animated
+    let backgroundImg = UIImageView()
+    
+    // boolean to check is errorView is currently showing or not
+    var infoViewIsShowing = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        var path: [AnyObject] = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true) as [AnyObject]
+        let folder: String = path[0] as! String
+        NSLog("Your NSUserDefaults are stored in this folder: %@/Preferences", folder)
+        
+     
+        
+   
+        
+        // creating imageView to store background image "mainbg.jpg"
+        backgroundImg.frame = CGRect(x: 0, y: 0, width: self.window!.bounds.height * 1.688, height: self.window!.bounds.height)
+        backgroundImg.image = UIImage(named: "mainbg.jpg")
+        self.window!.addSubview(backgroundImg)
+
+        moveBGLeft()
+        
+       
+        
+        // load value in user var
+        user = UserDefaults.standard.value(forKey: "parseJSON") as? NSDictionary
+        
+   
+        // if user is once logged in / register, keep him logged in
+        if user != nil {
+            let id = user!["id"] as? String
+            
+            if id != nil {
+                login()
+            }
+            
+        }
+        
         return true
     }
-
+    
+    // function to animate bg to move left
+    func moveBGLeft() {
+        
+        // begin animation
+        UIView.animate(withDuration: 45, animations: {
+            
+            // change hor origin
+            self.backgroundImg.frame.origin.x = -self.backgroundImg.bounds.width + self.window!.bounds.width
+        }) {(finished:Bool) in
+            
+            //if animation finished, excecute func moveBgRight
+            if finished {
+               
+                // move right
+                self.moveRight()
+            }
+            
+        }
+    }
+    // function to animate bg to move right
+    func moveRight() {
+        
+        // begin animation
+        UIView.animate(withDuration: 45, animations: {
+            
+            // moving back hor origin of bg to its native value
+            self.backgroundImg.frame.origin.x = 0
+        }) { (finished:Bool) in
+            
+            // if animation finished, execute func moveBgRight
+            if finished {
+                self.moveBGLeft()
+            }
+        }
+        
+    }
+    
+    // error view on top
+    func infoView(message:String, color:UIColor) {
+        
+        if infoViewIsShowing == false {
+            
+            // cast as errorView is currently showing
+            infoViewIsShowing = true
+            
+            // errorView - red background creation
+            let infoView_height = self.window!.bounds.height / 14.2
+            let infoView_Y = 0 - infoView_height
+            
+            
+            let infoView = UIView(frame: CGRect(x: 0, y: infoView_Y, width: self.window!.bounds.width, height: infoView_height))
+            infoView.backgroundColor = color
+            self.window!.addSubview(infoView)
+            
+            
+            
+            // errorLabel - label to show error text
+            let infoLabel_Width = infoView.bounds.width
+            let infoLabel_height = infoView.bounds.height + UIApplication.shared.statusBarFrame.height / 2
+            
+            let infoLabel = UILabel()
+            infoLabel.frame.size.width = infoLabel_Width
+            infoLabel.frame.size.height = infoLabel_height
+            infoLabel.numberOfLines = 0
+            
+            infoLabel.text = message
+            infoLabel.font = UIFont(name: "HelveticaNeue", size: fontSize12)
+            infoLabel.textColor = UIColor.white
+            infoLabel.textAlignment = .center
+            
+            infoView.addSubview(infoLabel)
+            
+            // animate error view
+            UIView.animate(withDuration: 0.2, animations: {
+                
+                // move down errorView
+                infoView.frame.origin.y = 0
+                
+                // if animation did finish
+            }, completion: { (finished:Bool) in
+                
+                // if its true
+                if finished {
+                    
+                    UIView.animate(withDuration: 0.1, delay: 3, options: .curveLinear, animations: {
+                        
+                        // move up errorView
+                        infoView.frame.origin.y = infoView_Y
+                        
+                        // if finished all animations
+                    }, completion: { (finished:Bool) in
+                        
+                        if finished {
+                            infoView.removeFromSuperview()
+                            infoLabel.removeFromSuperview()
+                            self.infoViewIsShowing = false
+                        }
+                        
+                    })
+                    
+                }
+            })
+        }
+        
+    }
+    
+    // func to pass to home page or to tabBar
+    func login() {
+        
+        // refer to our Main.storyboard in tabBar var
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        // store our tabBar Object from Main.storyboard in tabBar var
+        let tabBar = storyboard.instantiateViewController(withIdentifier: "tabBar")
+        
+        // present tabBar that is storing in tabBar var 
+        window?.rootViewController = tabBar
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
