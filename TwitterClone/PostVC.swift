@@ -18,21 +18,20 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
     @IBOutlet var postBtn: UIButton!
     
     // unique id of post
-    var uuid = String()
-    var imageSelected = false
+    @objc var uuid = String()
+    @objc var imageSelected = false
     
     
+    // first func
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view
         
         // round corners
         textTxt.layer.cornerRadius = textTxt.bounds.width / 50
         postBtn.layer.cornerRadius = postBtn.bounds.width / 20
         
-        // color
-        textTxt.backgroundColor = colorSmoothGray
-        selectBtn.setTitleColor(colorBrandBlue, for: .normal)
+        // colors
+        selectBtn.setTitleColor(colorBrandBlue, for: UIControlState())
         postBtn.backgroundColor = colorBrandBlue
         countLbl.textColor = colorSmoothGray
         
@@ -42,12 +41,14 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
         // disable button from the begining
         postBtn.isEnabled = false
         postBtn.alpha = 0.4
+        
     }
     
-    // entered some text in textView
+    
+    // entered some text in TextView
     func textViewDidChange(_ textView: UITextView) {
         
-        // counter
+        // numb of characters in textView
         let chars = textView.text.count
         
         // white spacing in text
@@ -62,28 +63,31 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
             postBtn.isEnabled = false
             postBtn.alpha = 0.4
             
-        // if entered only spaces and new lines
+            // if entered only spaces and new lines
         } else if textView.text.trimmingCharacters(in: spacing).isEmpty {
             postBtn.isEnabled = false
             postBtn.alpha = 0.4
             
-        // everything is correct
+            // everything is correct
         } else {
             countLbl.textColor = colorSmoothGray
             postBtn.isEnabled = true
             postBtn.alpha = 1
         }
+        
     }
+    
+    
     // touched screen
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    
-    // hide keyboard
+        
+        // hide keyboard
         self.view.endEditing(false)
     }
-
-    @IBAction func select_click(_ sender: Any) {
-        
-        
+    
+    
+    // clicked select picture button
+    @IBAction func select_click(_ sender: AnyObject) {
         
         // calling picker for selecting iamge
         let picker = UIImagePickerController()
@@ -101,7 +105,9 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
         self.dismiss(animated: true, completion: nil)
         
         // cast as a true to save image file in server
-        imageSelected = true
+        if pictureImg.image == info[UIImagePickerControllerEditedImage] as? UIImage {
+            imageSelected = true
+        }
     }
     
     
@@ -118,12 +124,14 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
             }
         }
         
+        
         // if file is not selected, it will not upload a file to server, because we did not declare a name file
         var filename = ""
         
         if imageSelected == true {
             filename = "post-\(uuid).jpg"
         }
+        
         
         let mimetype = "image/jpg"
         
@@ -139,30 +147,146 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
         
     }
     
-    // function sending request to PHP tp upload a file
+    
+    // function sending requset to PHP to uplaod a file
     @objc func uploadPost() {
         
+        // shortcuts to data to be passed to php file
         let id = user!["id"] as! String
-        let uuid = UUID().uuidString
-        let text = textTxt.text as String
+        uuid = UUID().uuidString
+        let text = textTxt.text.trunc(140) as String
+        
         
         // url path to php file
-        let url = URL(string: "http://locahost/Twitter/posts.php")!
+        let url = URL(string: "http://localhost/Twitter/posts.php")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        
+        // param to be passed to php file
+        let param = [
+            "id" : id,
+            "uuid" : uuid,
+            "text" : text
+        ]
+        
+        // body
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        // if picture is selected, compress it by half
+        var imageData = Data()
+        
+        if pictureImg.image != nil {
+            imageData = UIImageJPEGRepresentation(pictureImg.image!, 0.5)!
+        }
+        
+        // ... body
+        request.httpBody = createBodyWithParams(param, filePathKey: "file", imageDataKey: imageData, boundary: boundary)
+        
+        // launch session
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            // get main queu to communicate back to user
+            DispatchQueue.main.async(execute: {
+                
+                
+                if error == nil {
+                    
+                    do {
+                        
+                        // json containes $returnArray from php
+                        let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? NSDictionary
+                        
+                        // declare new var to store json inf
+                        guard let parseJSON = json else {
+                            print("Error while parsing")
+                            return
+                        }
+                        
+                        // get message from $returnArray["message"]
+                        let message = parseJSON["message"]
+                        
+                        // if there is some message - post is made
+                        if message != nil {
+                            
+                            // reset UI
+                            self.textTxt.text = ""
+                            self.countLbl.text = "140"
+                            self.pictureImg.image = nil
+                            self.postBtn.isEnabled = false
+                            self.postBtn.alpha = 0.4
+                            self.imageSelected = false
+                            
+                            // switch to another scene
+                            self.tabBarController?.selectedIndex = 0
+                            
+                        }
+                        
+                    } catch {
+                        
+                        // get main queue to communicate back to user
+                        DispatchQueue.main.async(execute: {
+                            let message = "\(error)"
+                            appDelegate.infoView(message: message, color: colorSmoothRed)
+                        })
+                        return
+                        
+                    }
+                    
+                } else {
+                    
+                    // get main queue to communicate back to user
+                    DispatchQueue.main.async(execute: {
+                        let message = error!.localizedDescription
+                        appDelegate.infoView(message: message, color: colorSmoothRed)
+                    })
+                    return
+                    
+                }
+                
+                
+            })
+            
+            }.resume()
+        
     }
     
     
     // clicked post button
-    @IBAction func post_click(_ sender: Any) {
+    @IBAction func post_click(_ sender: AnyObject) {
         
+        // if entered some text and text is less than 140 chars
         if !textTxt.text.isEmpty && textTxt.text.count <= 140 {
-            // post
             
+            // call func to uplaod post
+            uploadPost()
             
         }
         
     }
     
-
+    
 }
+
+
+
+
+// Extension to stirng type of variables
+extension String {
+    
+    // cut / trimm our string
+    func trunc(_ length: Int, trailing: String? = "...") -> String {
+        
+        if self.count > length {
+            return self.substring(to: self.index(self.startIndex, offsetBy: length)) + (trailing ?? "")
+        } else {
+            return self
+        }
+        
+    }
+    
+}
+
+
+
+
