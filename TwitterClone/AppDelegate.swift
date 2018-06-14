@@ -18,6 +18,8 @@ let colorBrandBlue = UIColor(red: 45/255, green: 213/255, blue: 255/255, alpha: 
 
 let fontSize12 = UIScreen.main.bounds.width / 31
 
+
+// stores all information about current user
 var user: NSDictionary?
 
 @UIApplicationMain

@@ -17,6 +17,10 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
     @IBOutlet var pictureImg: UIImageView!
     @IBOutlet var postBtn: UIButton!
     
+    // unique id of post
+    var uuid = String()
+    var imageSelected = false
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,10 +101,56 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
         self.dismiss(animated: true, completion: nil)
         
         // cast as a true to save image file in server
-        if pictureImg.image == info[UIImagePickerControllerEditedImage] as? UIImage {
-        }
+        imageSelected = true
     }
     
+    
+    // custom body of HTTP request to upload image file
+    @objc func createBodyWithParams(_ parameters: [String: String]?, filePathKey: String?, imageDataKey: Data, boundary: String) -> Data {
+        
+        let body = NSMutableData();
+        
+        if parameters != nil {
+            for (key, value) in parameters! {
+                body.appendString("--\(boundary)\r\n")
+                body.appendString("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+                body.appendString("\(value)\r\n")
+            }
+        }
+        
+        // if file is not selected, it will not upload a file to server, because we did not declare a name file
+        var filename = ""
+        
+        if imageSelected == true {
+            filename = "post-\(uuid).jpg"
+        }
+        
+        let mimetype = "image/jpg"
+        
+        body.appendString("--\(boundary)\r\n")
+        body.appendString("Content-Disposition: form-data; name=\"\(filePathKey!)\"; filename=\"\(filename)\"\r\n")
+        body.appendString("Content-Type: \(mimetype)\r\n\r\n")
+        body.append(imageDataKey)
+        body.appendString("\r\n")
+        
+        body.appendString("--\(boundary)--\r\n")
+        
+        return body as Data
+        
+    }
+    
+    // function sending request to PHP tp upload a file
+    @objc func uploadPost() {
+        
+        let id = user!["id"] as! String
+        let uuid = UUID().uuidString
+        let text = textTxt.text as String
+        
+        // url path to php file
+        let url = URL(string: "http://locahost/Twitter/posts.php")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+    }
     
     
     // clicked post button
