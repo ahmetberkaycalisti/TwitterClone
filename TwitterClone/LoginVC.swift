@@ -52,7 +52,7 @@ class LoginVC: UIViewController {
             request.httpMethod = "POST"
             
             // body gonna be appended to url
-            let body = "username=\(username)&password=\(password)"
+            let body = ""
             
             // append body to our request that gonna be sent
             request.httpBody = body.data(using: .utf8)
