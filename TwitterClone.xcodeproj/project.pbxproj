@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		950B05DC20CEF72C005FAE61 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950B05DB20CEF72B005FAE61 /* LoginVC.swift */; };
 		954320D120CFBBBE0084AF13 /* ResetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954320D020CFBBBE0084AF13 /* ResetVC.swift */; };
+		9554434D20D2399E003A514D /* PostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9554434C20D2399E003A514D /* PostCell.swift */; };
 		95796D8620D0BA8500EE6EA6 /* logout@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 95796D7920D0BA8200EE6EA6 /* logout@2x.png */; };
 		95796D8720D0BA8500EE6EA6 /* home@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 95796D7A20D0BA8200EE6EA6 /* home@2x.png */; };
 		95796D8820D0BA8500EE6EA6 /* users.png in Resources */ = {isa = PBXBuildFile; fileRef = 95796D7B20D0BA8300EE6EA6 /* users.png */; };
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		950B05DB20CEF72B005FAE61 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		954320D020CFBBBE0084AF13 /* ResetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetVC.swift; sourceTree = "<group>"; };
+		9554434C20D2399E003A514D /* PostCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
 		95796D7920D0BA8200EE6EA6 /* logout@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logout@2x.png"; sourceTree = "<group>"; };
 		95796D7A20D0BA8200EE6EA6 /* home@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home@2x.png"; sourceTree = "<group>"; };
 		95796D7B20D0BA8300EE6EA6 /* users.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = users.png; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				954320D020CFBBBE0084AF13 /* ResetVC.swift */,
 				95796D9B20D186A800EE6EA6 /* PostVC.swift */,
 				95F5856620CD7D8300DD41E1 /* Main.storyboard */,
+				9554434C20D2399E003A514D /* PostCell.swift */,
 				95796D9920D0CACB00EE6EA6 /* HomeVC.swift */,
 				95796D9320D0BB9C00EE6EA6 /* NavVC.swift */,
 				95796D9520D0BEA500EE6EA6 /* TabBarVC.swift */,
@@ -227,6 +230,7 @@
 				95796D9420D0BB9C00EE6EA6 /* NavVC.swift in Sources */,
 				95F5856520CD7D8300DD41E1 /* RegisterVC.swift in Sources */,
 				95F5856320CD7D8300DD41E1 /* AppDelegate.swift in Sources */,
+				9554434D20D2399E003A514D /* PostCell.swift in Sources */,
 				95796D9620D0BEA600EE6EA6 /* TabBarVC.swift in Sources */,
 				95796D9C20D186A800EE6EA6 /* PostVC.swift in Sources */,
 				950B05DC20CEF72C005FAE61 /* LoginVC.swift in Sources */,
