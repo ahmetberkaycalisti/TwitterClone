@@ -76,6 +76,32 @@ class PostVC: UIViewController, UITextViewDelegate, UIImagePickerControllerDeleg
     // hide keyboard
         self.view.endEditing(false)
     }
+
+    @IBAction func select_click(_ sender: Any) {
+        
+        
+        
+        // calling picker for selecting iamge
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.sourceType = .photoLibrary
+        picker.allowsEditing = true
+        self.present(picker, animated: true, completion: nil)
+    }
+    
+    
+    // selected image in picker view
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        pictureImg.image = info[UIImagePickerControllerEditedImage] as? UIImage
+        self.dismiss(animated: true, completion: nil)
+        
+        // cast as a true to save image file in server
+        if pictureImg.image == info[UIImagePickerControllerEditedImage] as? UIImage {
+        }
+    }
+    
+    
     
     // clicked post button
     @IBAction func post_click(_ sender: Any) {
